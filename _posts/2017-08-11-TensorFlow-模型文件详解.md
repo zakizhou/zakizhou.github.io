@@ -2,7 +2,7 @@ TensorFlow模型文件在模型训练完成后被保存（序列化）到本地�
 
 * *本文假定读者理解`TensorFlow`的图运算机制，如若不然，请参考此[教程](https://www.tensorflow.org/get_started/mnist/beginners)*
 
-*若部分链接若打不开，请想一想为什么*
+*部分链接若打不开是由于GFW*
 
 
 **本文由本博主原创，版权归本博主所有，转载请注明出处，否则将依法追究责任**

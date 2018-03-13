@@ -3,7 +3,7 @@
 本文假定了读者
 * *理解`TensorFlow`的图运算，如若不然，请参考此[教程](https://www.tensorflow.org/get_started/mnist/beginners)*
 
-*若部分链接若打不开，请想一想为什么*
+*部分链接若打不开是由于GFW*
 
 **本文由本博主原创，版权归本博主所有，转载请注明出处，否则将依法追究责任**
 
@@ -83,7 +83,7 @@ object_func = add_left + add_right
 
 第一个用到共享变量的地方是大名鼎鼎的递归神经网络，递归神经网络因为其权值是共享的，每向前传播一步，就要调用一次权值，因此在这里使用了共享变量，来看`TensorFlow`中递归神经网络的函数`tf.nn.static_rnn`的源代码
 
-![rnn](http://i4.bvimg.com/604224/03d673595581232a.jpg)
+![rnn](https://raw.githubusercontent.com/zakizhou/zakizhou.github.io/master/images/shared_variables/static_rnn_source_code.JPG)
 
 为了减小篇幅，我对源代码进行了折叠只保留了跟本文有关的部分，从上面的代码可以看到，`time`就是递归网络向前传播的步数，第一次传播时会创建权值，之后调用这个权值需要`reuse`一下，这也就是
 ```
@@ -111,7 +111,7 @@ with tf.variable_scope("model") as scope:
 ```
 训练集和验证集的损失都有了，才能画出这样一条深度学习中经常看见的曲线：
 
-![curve](http://i2.bvimg.com/604224/c80843482710d721.jpg)
+![curve](https://raw.githubusercontent.com/zakizhou/zakizhou.github.io/master/images/shared_variables/train_valid_curve.jpg)
 
 ---
 
