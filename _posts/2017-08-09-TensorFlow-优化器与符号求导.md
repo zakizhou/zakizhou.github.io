@@ -3,7 +3,7 @@
 本文假定了读者
 * *理解`TensorFlow`的图运算和基本的机器学习知识(如损失函数)，如若不然，请参考此[教程](https://www.tensorflow.org/get_started/mnist/beginners)*
 
-*若部分链接若打不开，请想一想为什么*
+*部分链接打不开是由于GFW*
 
 **本文由本博主原创，版权归本博主所有，转载请注明出处，否则将依法追究责任**
 
@@ -125,6 +125,41 @@ $$\frac{dy}{dx} = e^{\sin(x)}\cos(x)$$
 有了这个结论就能明白`TensorFlow`的符号导数的机制了，无论多么复杂的导数，无非就是先算$f_n$的导数，再算$f_{n-1}$的导数以此类推最后算$f_1$的导数然后乘在一起即可，所以`TensorFlow`的符号导数的机制是：
 
 **在`TensorFlow`中这些基础的函数$f_i(i=1,...,n)$(或者叫`op`，如`tf.exp`,`tf.sin`,`tf.log`)等等的导数是在实现这个`op`时就已经定义好的，用户使用这些的`op`构建目标（如损失函数），`TensorFlow`记住张量`Tensor`的运算的流程(`Flow`)最后再拼接这些`op`的导数计算出最终的导数**
+
+---
+
+## 源码解读
+第一小节使用了`tensorboard`来对`tf.gradients`得到的运算图进行了可视化方便读者理解，有了以上的例子之后再来看`tf.gradients`是如何
+做到自动求导的。
+
+在`tf.gradients`的源码中定位到最重要的一步，也就是
+
+![gradients](https://raw.githubusercontent.com/zakizhou/zakizhou.github.io/master/images/gradients/gradients.JPG)
+
+`ops.get_gradient_function(op)`是在尝试找到`op`对应的导数，继续查看`ops.get_gradient_function`
+这个函数的源代码，如下图所示
+
+![get_gradient_function]((https://raw.githubusercontent.com/zakizhou/zakizhou.github.io/master/images/gradients/get_gradient_function.JPG))
+
+`_gradient_registry.lookup(op_type)`是核心代码，是从`_gradient_registry`这个东西中查到`op`，接续查看`_gradient_registry`的源代码
+
+![gradient_registry](https://raw.githubusercontent.com/zakizhou/zakizhou.github.io/master/images/gradients/gradient_registry.JPG)
+
+定义在`tensorflow\python\framework\ops.py`中，是一个`registry.Registry`的实例，在这个定义的下方一点有一个
+`RegisterGradient`的类型定义
+
+![RegisterGradient](https://raw.githubusercontent.com/zakizhou/zakizhou.github.io/master/images/gradients/RegisterGradient.JPG)
+
+这是一个用来做装饰器的类型（因为`__call__`方法被定义了），可以看出就是这个函数将任意一个`Op`的导数链接给了这个`Op`，具体查看一下
+`tensorflow\python\ops\math_grad.py`这个文件中的`tf.square`这个`Op`的导数
+
+![square_grad](https://raw.githubusercontent.com/zakizhou/zakizhou.github.io/master/images/gradients/square_grad.JPG)
+
+平方的导数是其自身的两倍，这个定义正是如此！
+
+到此`tensorflow`的求导的源代码的核心就解读完了，一句话概括就是每一个`Op`都事先定义好了自己的导数，并使用`_gradient_registery`链接
+到这个`Op`，在使用`tf.gradients`进行求导时，`tensorflow`会查看这个链接，并使用锁链规则将每个`Op`的导数结合在一起，得到最终每个`tf.Variable`
+的导数。
 
 ---
 
