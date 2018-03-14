@@ -62,7 +62,7 @@ before applying them you can instead use the optimizer in three steps:
 # 符号导数的计算
 第一节中提到了`optimizer.compute_gradients`能够计算**符号导数**，下面来看一下她是如何计算出来的
 
-![gradients](http://i4.bvimg.com/604224/1fd925aae3e2ab60.jpg)
+![compute_gradients](https://raw.githubusercontent.com/zakizhou/zakizhou.github.io/master/images/gradients/compute_gradients.JPG)
 
 这段代码是`tf.train.Optimizer`的`compute_gradients`方法的源代码，从中可以看出，除去一些条件的判断和处理，最核心的一步就是用`gradients.gradients`算出的导数，这个函数已经暴露出来，也就是`tf.gradients`函数，为了清晰地看清楚这个函数是怎么运行的，使用`TensorBoard`对运算图进行可视化。
 
@@ -86,7 +86,7 @@ tensorboard --logdir <your/path/to/save/graph>
 ```
 然后按照提示打开浏览器，点击`GRAPHS`一栏，就能看到如下结果
 
-![sin(x)](http://i1.bvimg.com/604224/65347f0274772071.jpg)
+![sin(x)](https://raw.githubusercontent.com/zakizhou/zakizhou.github.io/master/images/gradients/example1.png)
 
 其中`Variable`就是我们定义的`x`,然后与`Sin`节点连接，也就是执行的`y = tf.sin(x)`，而`gradients = tf.gradients(y, [x])`则添加了算导数的这些节点，$y = \sin(x)$的导数是$\frac{dy}{dx} = \cos(x)$，而在这个图当中`Variable`(`x`)也与`Cos`节点相连接(`mul`节点的另一个输入是$1$不影响结果)得到$\cos(x)$，这与我们手动算出的导数是一致的。
 
@@ -107,7 +107,7 @@ writer.add_graph(graph=tf.get_default_graph())
 ```
  运算图结构如下：
 
-![exp](http://i1.bvimg.com/604224/b0b721249c1ca6b6.jpg)
+![exp](https://raw.githubusercontent.com/zakizhou/zakizhou.github.io/master/images/gradients/example2.png)
 
 来看一下具体过程。首先创建`Variable`(`x`)，然后依次流经`Sin`节点和`Exp`节点得到$e^{\sin(x)}$，而$y = e^{\sin(x)}$的导数是
 $$\frac{dy}{dx} = e^{\sin(x)}\cos(x)$$
@@ -139,7 +139,7 @@ $$\frac{dy}{dx} = e^{\sin(x)}\cos(x)$$
 `ops.get_gradient_function(op)`是在尝试找到`op`对应的导数，继续查看`ops.get_gradient_function`
 这个函数的源代码，如下图所示
 
-![get_gradient_function]((https://raw.githubusercontent.com/zakizhou/zakizhou.github.io/master/images/gradients/get_gradient_function.JPG))
+![get_gradient_function](https://raw.githubusercontent.com/zakizhou/zakizhou.github.io/master/images/gradients/get_gradient_function.JPG)
 
 `_gradient_registry.lookup(op_type)`是核心代码，是从`_gradient_registry`这个东西中查到`op`，接续查看`_gradient_registry`的源代码
 
