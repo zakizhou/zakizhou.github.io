@@ -17,7 +17,7 @@
 
 多GPU训练能够让训练速度有非常大的提升，先来看一看具体的流程。
 
-![alt text](http://i1.bvimg.com/1949/b4474470a8e4552f.jpg)
+![multi-gpus](https://raw.githubusercontent.com/zakizhou/zakizhou.github.io/master/images/multi-gpus/mmulti-gpus.png)
 这个流程的具体意思是有
 * 变量创建在`CPU`上
 * 每个`GPU`称为一个`tower`, 每个`GPU`上都会放置一份模型
@@ -95,9 +95,78 @@ def average_gradients(tower_grads):
 [("grad0_gpu1", "var0_gpu1"), ("grad1_gpu1", "var1_gpu1"), ("grad2_gpu1", "var2_gpu1")]]
 ```
 变成了`[("mean_grad_0", "var0"), ("mean_grad_1", "var1"), ("mean_grad2", "var2")]`
-也就做到了收集梯度，并进行平均的功能，最后只需要`apply_gradients`就可以了，来看看完整的多`GPU`训练的代码
+也就做到了收集梯度，并进行平均的功能，最后只需要`apply_gradients`就可以了，来看看完整的多`GPU`训练的[代码](https://github.com/tensorflow/models/blob/master/tutorials/image/cifar10/cifar10_multi_gpu_train.py)
 
-![image](http://i1.bvimg.com/604224/15b32bef8d70bdc6.jpg)
+```python
+
+def train():
+  """Train CIFAR-10 for a number of steps."""
+  with tf.Graph().as_default(), tf.device('/cpu:0'):
+    # Create a variable to count the number of train() calls. This equals the
+    # number of batches processed * FLAGS.num_gpus.
+    global_step = tf.get_variable(
+        'global_step', [],
+        initializer=tf.constant_initializer(0), trainable=False)
+
+    # Calculate the learning rate schedule.
+    num_batches_per_epoch = (cifar10.NUM_EXAMPLES_PER_EPOCH_FOR_TRAIN /
+                             FLAGS.batch_size)
+    decay_steps = int(num_batches_per_epoch * cifar10.NUM_EPOCHS_PER_DECAY)
+
+    # Decay the learning rate exponentially based on the number of steps.
+    lr = tf.train.exponential_decay(cifar10.INITIAL_LEARNING_RATE,
+                                    global_step,
+                                    decay_steps,
+                                    cifar10.LEARNING_RATE_DECAY_FACTOR,
+                                    staircase=True)
+
+    # Create an optimizer that performs gradient descent.
+    opt = tf.train.GradientDescentOptimizer(lr) # (1)
+
+    # Get images and labels for CIFAR-10.
+    images, labels = cifar10.distorted_inputs()
+    batch_queue = tf.contrib.slim.prefetch_queue.prefetch_queue(
+          [images, labels], capacity=2 * FLAGS.num_gpus)
+    # Calculate the gradients for each model tower.
+    tower_grads = []
+    with tf.variable_scope(tf.get_variable_scope()):
+      for i in xrange(FLAGS.num_gpus): # (2)
+        with tf.device('/gpu:%d' % i):
+          with tf.name_scope('%s_%d' % (cifar10.TOWER_NAME, i)) as scope:
+            # Dequeues one batch for the GPU
+            image_batch, label_batch = batch_queue.dequeue()
+            # Calculate the loss for one tower of the CIFAR model. This function
+            # constructs the entire CIFAR model but shares the variables across
+            # all towers.
+            loss = tower_loss(scope, image_batch, label_batch) # (3)
+
+            # Reuse variables for the next tower.
+            tf.get_variable_scope().reuse_variables() # (4)
+
+            # Retain the summaries from the final tower.
+            summaries = tf.get_collection(tf.GraphKeys.SUMMARIES, scope)
+
+            # Calculate the gradients for the batch of data on this CIFAR tower.
+            grads = opt.compute_gradients(loss) # (5)
+
+            # Keep track of the gradients across all towers.
+            tower_grads.append(grads) # (6)
+
+    # We must calculate the mean of each gradient. Note that this is the
+    # synchronization point across all towers.
+    grads = average_gradients(tower_grads) # (6)
+
+    # Add a summary to track the learning rate.
+    summaries.append(tf.summary.scalar('learning_rate', lr))
+
+    # Add histograms for gradients.
+    for grad, var in grads:
+      if grad is not None:
+        summaries.append(tf.summary.histogram(var.op.name + '/gradients', grad))
+
+    # Apply the gradients to adjust the shared variables.
+    apply_gradient_op = opt.apply_gradients(grads, global_step=global_step) # (7)
+```
 一些解释：
 * 首先在`CPU`上定义了优化器`opt`
 * 对`GPU`进行循环，在每个`GPU`上算出`loss`，**reuse variable**，计算导数，并收集导数

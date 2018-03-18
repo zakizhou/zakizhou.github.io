@@ -27,7 +27,7 @@
 
 ---
 
-![image](http://thumbnail0.baidupcs.com/thumbnail/64264e1e14076ef530d6548390aed565?fid=2419221423-250528-217803025057677&time=1503738000&rt=sh&sign=FDTAER-DCb740ccc5511e5e8fedcff06b081203-5HDN0fI1%2BDUVWh6u0MmnI4iRLow%3D&expires=8h&chkv=0&chkbd=0&chkpc=&dp-logid=5513686513751886572&dp-callid=0&size=c710_u400&quality=100&vuk=-&ft=video)
+![image](https://raw.githubusercontent.com/zakizhou/zakizhou.github.io/master/images/refinenet/image.png)
 
 该图展示了目前常见的语义分割模型以及RefineNet的总体框架
 
@@ -46,7 +46,7 @@
 
 ## RefineNet Block
 一共有四个RefineNet Block，看一下内部的结构
-![image](http://thumbnail0.baidupcs.com/thumbnail/5877488cce4f5e1f21a8ca5169181c2a?fid=2419221423-250528-640804689587440&time=1503738000&rt=sh&sign=FDTAER-DCb740ccc5511e5e8fedcff06b081203-%2FR7vdTeNHF7xEqiWRPJZu%2FuzpsU%3D&expires=8h&chkv=0&chkbd=0&chkpc=&dp-logid=5513678016338468947&dp-callid=0&size=c710_u400&quality=100&vuk=-&ft=video)
+![refinenet](https://raw.githubusercontent.com/zakizhou/zakizhou.github.io/master/images/refinenet/refinenet.png)
 
 ### Residual Convolution Unit（RCU）
 除了RefineNet-4只有一路输入，其余的Block全部都有两路输入，每一路输入都要经过两个Residual Convolution Unit（RCU）来提取特征。

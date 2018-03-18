@@ -10,7 +10,7 @@ Faster-RCNN中的RPN和Fast-RCNN都仅仅使用了使用了一个feature map（v
 
 # Object Detection中的一些困难
 
-![FPN](http://thumbnail0.baidupcs.com/thumbnail/e75c6f5d3d6b1a8d3730867593df7538?fid=2419221423-250528-853011733514779&time=1503748800&rt=sh&sign=FDTAER-DCb740ccc5511e5e8fedcff06b081203-IbyCmTLRfq4dHL12SCRtrIJP6zo%3D&expires=8h&chkv=0&chkbd=0&chkpc=&dp-logid=5516685682978040996&dp-callid=0&size=c710_u400&quality=100&vuk=-&ft=video)
+![FPN](https://raw.githubusercontent.com/zakizhou/zakizhou.github.io/master/images/fpn/fpn.png)
 
 论文指出：
 识别尺寸不同的物体是计算机视觉中一个基础的挑战，基于[图像金字塔](http://docs.opencv.org/2.4/doc/tutorials/imgproc/pyramids/pyramids.html)(上图a所示)
@@ -30,7 +30,7 @@ Faster-RCNN中的RPN和Fast-RCNN都仅仅使用了使用了一个feature map（v
 Feature Pyramid Networks使用单张图像作为输入，使用全卷积地方式，输出成比例多尺度的feature map。这个过程是独立于backbone的网络结构的，因为任何
 一个卷积网络都有这样的形式，在这篇论文中作者使用了ResNet（又是她！），这个特征金字塔的构建包含了底到顶、顶到底和侧向的连接三个部分。
 结果如下所示：
-![image](http://thumbnail0.baidupcs.com/thumbnail/64264e1e14076ef530d6548390aed565?fid=2419221423-250528-217803025057677&time=1503738000&rt=sh&sign=FDTAER-DCb740ccc5511e5e8fedcff06b081203-5HDN0fI1%2BDUVWh6u0MmnI4iRLow%3D&expires=8h&chkv=0&chkbd=0&chkpc=&dp-logid=5513686513751886572&dp-callid=0&size=c710_u400&quality=100&vuk=-&ft=video)
+![image](https://raw.githubusercontent.com/zakizhou/zakizhou.github.io/master/images/fpn/design.png)
 
 ## 底到顶（Bottom-up pathway）
 

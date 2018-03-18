@@ -18,7 +18,7 @@ RPN的主要思想是先在原始图像上的不同位置人为摆放大量的�
 以VGG16（网络结构如下）为base network为例
 
 
-![vgg16](http://i4.bvimg.com/604224/4450e2b58b38c5fe.png)
+![vgg16](https://raw.githubusercontent.com/zakizhou/zakizhou.github.io/master/images/faster-rcnn/vgg16.png)
 
 从第五个pooling层（包括）截断，这样一共有四个pooling层，图片尺寸变为原来的十六分之一。
 以一张640 * 960的图像为例，生成的feature map的大小为`[40, 60, 512]`。
@@ -30,7 +30,7 @@ RPN的主要思想是先在原始图像上的不同位置人为摆放大量的�
 的每个位置上放9个大小纵横比都不同的anchors（anchor的中心与每个位置对齐），然后将这9个anchors映射回原来的图像上（映射方式为feature map的(i, j)回到图像的(16i, 16j)）。
 这9个anchors取了3种尺度(`[128, 256, 512]`)，3中纵横比(`[1/2, 1, 2]`)，见下图
 
-![anchros_1](http://i4.bvimg.com/604224/bbc5a450db49c753.png)
+![anchros_1](https://raw.githubusercontent.com/zakizhou/zakizhou.github.io/master/images/faster-rcnn/anchors.png)
 
 对于`[40, 60, 512]`的feature map来说就会生成`40 * 60 * 9`这么多anchors，为了确定这些anchors
 哪些是与ground truth的bounding boxes重合（或者说anchor包含object）的，每个anchors需要输出一个
@@ -62,11 +62,11 @@ boxes完全重合。
 
 有了label，RPN的损失函数的定义为:
 
-![loss](http://i2.bvimg.com/604224/f74fb794fe134c49.png)
+![loss](https://raw.githubusercontent.com/zakizhou/zakizhou.github.io/master/images/faster-rcnn/loss.png)
 
 分为分类cls损失和坐标回归reg损失两部分
 
-![xy](http://i4.bvimg.com/604224/1c88231b323dd70d.png)
+![xy](https://raw.githubusercontent.com/zakizhou/zakizhou.github.io/master/images/faster-rcnn/transform.png)
 
 其中`tx, ty, tw, th`四个量也就是output1中`40 * 60`的feature map上每个位置产生的`9`个anchors的每个`anchor`的四个量
 `tx*, ty*, tw*, th*`是由label计算出来的坐标的偏移量
